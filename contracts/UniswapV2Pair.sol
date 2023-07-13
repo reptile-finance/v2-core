@@ -16,7 +16,6 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     bytes4 private constant SELECTOR = bytes4(keccak256(bytes('transfer(address,uint256)')));
 
     address public factory;
-    address public reptileFinanceVault;
     address public token0;
     address public token1;
 
@@ -64,11 +63,10 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     }
 
     // called once by the factory at time of deployment
-    function initialize(address _token0, address _token1, address _reptileFinanceVault) external {
+    function initialize(address _token0, address _token1) external {
         require(msg.sender == factory, 'UniswapV2: FORBIDDEN'); // sufficient check
         token0 = _token0;
         token1 = _token1;
-        reptileFinanceVault = _reptileFinanceVault;
     }
 
     // update reserves and, on the first call per block, price accumulators
@@ -185,13 +183,13 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
         }
 
         {
-            uint reptileFinanceFe0 = amount0In.mul(5) / 10000;
+            uint reptileFinanceFee0 = amount0In.mul(5) / 10000;
             uint reptileFinanceFe1 = amount1In.mul(5) / 10000;
 
-            if (reptileFinanceFe0 > 0) _safeTransfer(token0, reptileFinanceVault, reptileFinanceFe0);
-            if (reptileFinanceFe1 > 0) _safeTransfer(token1, reptileFinanceVault, reptileFinanceFe1);
+            if (reptileFinanceFee0 > 0) _safeTransfer(token0, IUniswapV2Factory(factory).reptileFinanceVault(), reptileFinanceFee0);
+            if (reptileFinanceFe1 > 0) _safeTransfer(token1, IUniswapV2Factory(factory).reptileFinanceVault(), reptileFinanceFe1);
             
-            _update(balance0 - reptileFinanceFe0, balance1 - reptileFinanceFe1, _reserve0, _reserve1);
+            _update(balance0 - reptileFinanceFee0, balance1 - reptileFinanceFe1, _reserve0, _reserve1);
             emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, to);
         }
     }
