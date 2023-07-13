@@ -190,8 +190,8 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
             if (reptileFinanceFe1 > 0) _safeTransfer(token1, IUniswapV2Factory(factory).reptileFinanceVault(), reptileFinanceFe1);
             
             _update(balance0 - reptileFinanceFee0, balance1 - reptileFinanceFe1, _reserve0, _reserve1);
-            emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, to);
         }
+        emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, to);
     }
 
     // force balances to match reserves
