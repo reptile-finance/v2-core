@@ -188,10 +188,10 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
             uint reptileFinanceFe0 = amount0In.mul(5) / 10000;
             uint reptileFinanceFe1 = amount1In.mul(5) / 10000;
 
-            _safeTransfer(token0, reptileFinanceVault, reptileFinanceFe0);
-            _safeTransfer(token1, reptileFinanceVault, reptileFinanceFe1);
+            if (reptileFinanceFe0 > 0) _safeTransfer(token0, reptileFinanceVault, reptileFinanceFe0);
+            if (reptileFinanceFe1 > 0) _safeTransfer(token1, reptileFinanceVault, reptileFinanceFe1);
             
-            _update(balance0, balance1, _reserve0, _reserve1);
+            _update(balance0 - reptileFinanceFe0, balance1 - reptileFinanceFe1, _reserve0, _reserve1);
             emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, to);
         }
     }
