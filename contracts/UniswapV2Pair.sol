@@ -177,13 +177,21 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
         uint amount1In = balance1 > _reserve1 - amount1Out ? balance1 - (_reserve1 - amount1Out) : 0;
         require(amount0In > 0 || amount1In > 0, 'UniswapV2: INSUFFICIENT_INPUT_AMOUNT');
         { // scope for reserve{0,1}Adjusted, avoids stack too deep errors
-        uint balance0Adjusted = balance0.mul(1000).sub(amount0In.mul(3));
-        uint balance1Adjusted = balance1.mul(1000).sub(amount1In.mul(3));
-        require(balance0Adjusted.mul(balance1Adjusted) >= uint(_reserve0).mul(_reserve1).mul(1000**2), 'UniswapV2: K');
+        uint balance0Adjusted = balance0.mul(10000).sub(amount0In.mul(25));
+        uint balance1Adjusted = balance1.mul(10000).sub(amount1In.mul(25));
+        require(balance0Adjusted.mul(balance1Adjusted) >= uint(_reserve0).mul(_reserve1).mul(10000**2), 'UniswapV2: K');
         }
 
-        _update(balance0, balance1, _reserve0, _reserve1);
-        emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, to);
+        {
+            uint reptileFinanceFee0 = amount0In.mul(5) / 10000;
+            uint reptileFinanceFe1 = amount1In.mul(5) / 10000;
+
+            if (reptileFinanceFee0 > 0) _safeTransfer(token0, IUniswapV2Factory(factory).reptileFinanceVault(), reptileFinanceFee0);
+            if (reptileFinanceFe1 > 0) _safeTransfer(token1, IUniswapV2Factory(factory).reptileFinanceVault(), reptileFinanceFe1);
+            
+            _update(balance0 - reptileFinanceFee0, balance1 - reptileFinanceFe1, _reserve0, _reserve1);
+            emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, to);
+        }
     }
 
     // force balances to match reserves
