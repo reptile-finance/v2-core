@@ -59,4 +59,8 @@ contract UniswapV2Factory is IUniswapV2Factory {
     function setReptileFinanceVault(address _reptileFinanceVault) external onlyOwner {
         reptileFinanceVault = _reptileFinanceVault;
     }
+
+    function setOwner(address _owner) external onlyOwner {
+        owner = _owner;
+    }
 }
